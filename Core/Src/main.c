@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include "ws2812.h"
 #include "ir_remote.h"
+#include "lighting.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -53,6 +54,10 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 decode_results results;
+
+double satur = 1.0, brigh = 0.010, brigh_last = 0;
+uint16_t delay = 100;
+long long millis = 0, millis_last = 0;;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -103,27 +108,34 @@ int main(void) {
 	MX_TIM4_Init();
 	MX_USART1_UART_Init();
 	/* USER CODE BEGIN 2 */
+
 	ir_enableIRIn();
 	char trans_str[64] = { 0, };
 	snprintf(trans_str, 64, "IR-receiver\r\n");
 	HAL_UART_Transmit(&huart1, (uint8_t*) trans_str, strlen(trans_str), 100);
 
 	for (uint16_t i = 0; i < 40; i++) {
-		ws2812_pixel_rgb_to_buf_dma(1, 0, 1, i);
-
-		ws2812_light();
+		led_rgb_to_buf_dma(1, 1, 1, i);
 	}
+	led_light();
+
+	remake_palette(brigh, satur);
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 
+		millis = HAL_GetTick();
+		if (millis_last + delay < millis) {
+			millis_last = millis;
+			rainbow(1, 600, 8);
+		}
+
 		if (ir_decode(&results)) {
 			snprintf(trans_str, 64, "Code: HEX %p DEC %lu\r\n",
 					(void*) results.value, results.value);
-			HAL_UART_Transmit(&huart1, (uint8_t*) trans_str, strlen(trans_str),
-					100);
+			HAL_UART_Transmit(&huart1, (uint8_t*) trans_str, strlen(trans_str), 100);
 			HAL_Delay(50);
 			ir_resume();
 		}

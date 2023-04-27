@@ -1,3 +1,6 @@
+#ifndef IR_REMOTE_H_
+#define IR_REMOTE_H_
+
 #include "stm32f4xx_hal.h"
 #include <stdio.h>
 #include "main.h"
@@ -44,3 +47,5 @@ int16_t ir_decode(decode_results *results);
 int32_t decodeHash(decode_results *results);
 void ir_enableIRIn();
 void ir_resume();
+
+#endif /* IR_REMOTE_H_ */
