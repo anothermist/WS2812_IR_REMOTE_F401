@@ -1,0 +1,6 @@
+at24.c:5:9:AT24XX_IsConnected	2
+at24.c:12:9:AT24XX_Save	3
+at24.c:39:9:AT24XX_Load	2
+at24.c:51:9:AT24XX_Read	1
+at24.c:57:6:AT24XX_Write	1
+at24.c:62:6:AT24XX_Update	2

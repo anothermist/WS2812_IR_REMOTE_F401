@@ -21,16 +21,17 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "ws2812.h"
-#include "ir_remote.h"
-#include "lighting.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "at24.h"
 #include "ili9488.h"
 #include "xpt2046.h"
+#include "ir_remote.h"
+#include "ws2812.h"
+#include "lighting.h"
 
 #include "fonts/Font_3_Tiny.h"
 #include "fonts/Font_3_PicoPixel.h"
@@ -153,6 +154,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+I2C_HandleTypeDef hi2c1;
+
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi2;
 
@@ -168,7 +171,7 @@ uint16_t touchX = 0, touchY = 0;
 //uint64_t millis = 0;
 decode_results results;
 
-double satur = 1.0, brigh = 0.00392156862745098 * 3, brigh_last = 0;
+double satur = 1.0, bright = 0.0, bright_last = 0.0;
 uint16_t delay = 100;
 long long millis = 0, millis_last = 0;
 ;
@@ -183,6 +186,7 @@ static void MX_TIM4_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_SPI2_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -196,7 +200,8 @@ static void MX_SPI2_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void) {
+int main(void)
+{
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -225,6 +230,7 @@ int main(void) {
   MX_USART1_UART_Init();
   MX_SPI1_Init();
   MX_SPI2_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
 	ir_enableIRIn();
@@ -232,12 +238,14 @@ int main(void) {
 	snprintf(trans_str, 64, "IR-receiver\r\n");
 	HAL_UART_Transmit(&huart1, (uint8_t*) trans_str, strlen(trans_str), 100);
 
+	bright = AT24XX_Read(10);
+
 	for (uint16_t i = 0; i < 40; i++) {
 		led_rgb_to_buf_dma(1, 1, 1, i);
 	}
 	led_light();
 
-	remake_palette(brigh, satur);
+	remake_palette(bright / 255, satur);
 
 	LCD_Init();
 	XPT2046_Init();
@@ -326,14 +334,16 @@ int main(void) {
 			HAL_Delay(50);
 			ir_resume();
 
-			if (results.value == 0xb3d4b87f) { // Button: "[BR+]"
-				brigh += 0.00392156862745098;
-				remake_palette(brigh, satur);
+			if (results.value == 0xb3d4b87f && bright < 255) { // Button: "[BR+]"
+				bright += 1;
+				AT24XX_Write(10, bright);
+				remake_palette(bright / 255, satur);
 			}
 
-			if (results.value == 0x44490a7b) { // Button: "[BR-]"
-				brigh -= 0.00392156862745098;
-				remake_palette(brigh, satur);
+			if (results.value == 0x44490a7b && bright > 0) { // Button: "[BR-]"
+				bright -= 1;
+				AT24XX_Write(10, bright);
+				remake_palette(bright / 255, satur);
 			}
 		}
     /* USER CODE END WHILE */
@@ -387,6 +397,40 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
+
 }
 
 /**
@@ -659,6 +703,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(IR_REC_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : KEY_Pin */
+  GPIO_InitStruct.Pin = KEY_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(KEY_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : TOUCH_IRQ_Pin */
   GPIO_InitStruct.Pin = TOUCH_IRQ_Pin;

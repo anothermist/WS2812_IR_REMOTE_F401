@@ -164,6 +164,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define IR_REC_Pin GPIO_PIN_13
 #define IR_REC_GPIO_Port GPIOC
+#define KEY_Pin GPIO_PIN_0
+#define KEY_GPIO_Port GPIOA
 #define TOUCH_IRQ_Pin GPIO_PIN_3
 #define TOUCH_IRQ_GPIO_Port GPIOA
 #define LCD_DC_Pin GPIO_PIN_1
