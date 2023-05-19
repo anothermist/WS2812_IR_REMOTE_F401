@@ -161,6 +161,7 @@ SPI_HandleTypeDef hspi2;
 
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim4;
+TIM_HandleTypeDef htim10;
 DMA_HandleTypeDef hdma_tim1_ch1;
 
 UART_HandleTypeDef huart1;
@@ -174,7 +175,7 @@ decode_results results;
 double satur = 1.0, bright = 0.0, bright_last = 0.0;
 uint16_t delay = 100;
 long long millis = 0, millis_last = 0;
-;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -187,6 +188,7 @@ static void MX_USART1_UART_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_TIM10_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -231,7 +233,11 @@ int main(void)
   MX_SPI1_Init();
   MX_SPI2_Init();
   MX_I2C1_Init();
+  MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
+
+	TIM10->CCR1 = 125;
+//	HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1);
 
 	ir_enableIRIn();
 	char trans_str[64] = { 0, };
@@ -302,23 +308,14 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	while (1) {
 
-		if ((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3) == GPIO_PIN_SET))
-			touchIRQ = 1;
-
-		touchIRQ = 1;
-
-		if (touchIRQ) {
 			touchX = getX();
 			touchY = getY();
-			if (touchX && touchY && touchY != 0x0DB) {
-				HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+			if (touchX && touchY) {
 				LCD_Rect_Fill(touchX, touchY, 1, 1, WHITE);
 			}
-			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+
 			touchX = 0;
 			touchY = 0;
-			touchIRQ = 0;
-		}
 
 		millis = HAL_GetTick();
 		if (millis_last + delay < millis) {
@@ -329,22 +326,24 @@ int main(void)
 		if (ir_decode(&results)) {
 			snprintf(trans_str, 64, "Code: HEX %p DEC %lu\r\n",
 					(void*) results.value, results.value);
-			HAL_UART_Transmit(&huart1, (uint8_t*) trans_str, strlen(trans_str),
-					100);
-			HAL_Delay(50);
-			ir_resume();
+			HAL_UART_Transmit(&huart1, (uint8_t*) trans_str, strlen(trans_str), 100);
 
-			if (results.value == 0xb3d4b87f && bright < 255) { // Button: "[BR+]"
-				bright += 1;
-				AT24XX_Write(10, bright);
-				remake_palette(bright / 255, satur);
-			}
+			HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1);
+			HAL_Delay(50);
+			HAL_TIM_PWM_Stop(&htim10, TIM_CHANNEL_1);
 
 			if (results.value == 0x44490a7b && bright > 0) { // Button: "[BR-]"
 				bright -= 1;
 				AT24XX_Write(10, bright);
 				remake_palette(bright / 255, satur);
 			}
+
+			if (results.value == 0xb3d4b87f && bright < 255) { // Button: "[BR+]"
+				bright += 1;
+				AT24XX_Write(10, bright);
+				remake_palette(bright / 255, satur);
+			}
+			ir_resume();
 		}
     /* USER CODE END WHILE */
 
@@ -370,13 +369,12 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 84;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 25;
+  RCC_OscInitStruct.PLL.PLLN = 168;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
@@ -626,6 +624,52 @@ static void MX_TIM4_Init(void)
   /* USER CODE BEGIN TIM4_Init 2 */
 
   /* USER CODE END TIM4_Init 2 */
+
+}
+
+/**
+  * @brief TIM10 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM10_Init(void)
+{
+
+  /* USER CODE BEGIN TIM10_Init 0 */
+
+  /* USER CODE END TIM10_Init 0 */
+
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM10_Init 1 */
+
+  /* USER CODE END TIM10_Init 1 */
+  htim10.Instance = TIM10;
+  htim10.Init.Prescaler = 84-1;
+  htim10.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim10.Init.Period = 250-1;
+  htim10.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim10.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim10) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim10) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim10, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM10_Init 2 */
+
+  /* USER CODE END TIM10_Init 2 */
+  HAL_TIM_MspPostInit(&htim10);
 
 }
 
