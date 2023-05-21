@@ -1,3 +1,2 @@
-lighting.c:13:5:hsv_rgb	8
-lighting.c:78:6:remake_palette	2
-lighting.c:90:6:rainbow	6
+lighting.c:7:6:remake_palette	2
+lighting.c:18:6:rainbow	6

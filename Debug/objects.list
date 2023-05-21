@@ -3,6 +3,7 @@
 "./Core/Src/ir_remote.o"
 "./Core/Src/lighting.o"
 "./Core/Src/main.o"
+"./Core/Src/rgb_hsv.o"
 "./Core/Src/stm32f4xx_hal_msp.o"
 "./Core/Src/stm32f4xx_it.o"
 "./Core/Src/syscalls.o"

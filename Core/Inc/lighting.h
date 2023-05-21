@@ -2,7 +2,7 @@
 #define LIGHTING_H_
 
 #include "main.h"
-#include <math.h>
+#include "rgb_hsv.h"
 #include "ws2812.h"
 
 void remake_palette(double brightness, double saturation);
