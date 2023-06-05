@@ -33,26 +33,27 @@
 #include "ws2812.h"
 #include "rgb_hsv.h"
 #include "lighting.h"
+#include "interface.h"
 
-#include "fonts/DejaVu_Sans/008_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/009_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/010_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/011_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/012_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/014_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/016_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/018_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/020_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/022_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/024_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/026_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/028_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/036_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/048_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/072_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/096_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/112_DejaVu_Sans.h"
-#include "fonts/DejaVu_Sans/128_DejaVu_Sans.h"
+#include "fonts/DejaVu_Sans_Mono/008_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/009_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/010_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/011_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/012_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/014_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/016_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/018_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/020_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/022_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/024_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/026_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/028_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/036_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/048_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/072_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/096_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/112_DejaVu_Sans_Mono.h"
+#include "fonts/DejaVu_Sans_Mono/128_DejaVu_Sans_Mono.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -119,8 +120,7 @@ static void MX_TIM10_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
-{
+int main(void) {
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -173,27 +173,24 @@ int main(void)
 	LCD_Init();
 	XPT2046_Init();
 
-//	LCD_Rect_Fill(0, 0, LCD_WIDTH, LCD_HEIGHT, BLUE);
-//	LCD_Rect_Fill(1, 1, LCD_WIDTH - 2, LCD_HEIGHT - 2, BLACK);
+	show_clean();
 
-	LCD_Rect(0, 0, LCD_WIDTH, LCD_HEIGHT, 1, WHITE);
+	LCD_Font(5, 25, "R:127", &DejaVu_Sans_Mono_20, 1, RED);
+	LCD_Font(5, 50, "G:127", &DejaVu_Sans_Mono_20, 1, GREEN);
+	LCD_Font(5, 75, "B:127", &DejaVu_Sans_Mono_20, 1, BLUE);
+	LCD_Font(5, 100, "H:180", &DejaVu_Sans_Mono_20, 1, WHITE);
+	LCD_Font(5, 125, "S:127", &DejaVu_Sans_Mono_20, 1, GRAY);
+	LCD_Font(5, 150, "V:127", &DejaVu_Sans_Mono_20, 1, YELLOW);
+	LCD_Font(5, 175, "D:100", &DejaVu_Sans_Mono_20, 1, CYAN);
 
-	LCD_Rect_Round(110, 10, 256, 15, 1, 1, RED);
-	LCD_Rect_Round(110, 35, 256, 15, 1, 1, GREEN);
-	LCD_Rect_Round(110, 60, 256, 15, 1, 1, BLUE);
-	LCD_Rect_Round(110, 85, 361, 15, 1, 1, WHITE);
-	LCD_Rect_Round(110, 110, 256, 15, 1, 1, GRAY);
-	LCD_Rect_Round(110, 135, 256, 15, 1, 1, YELLOW);
-	LCD_Rect_Round(110, 160, 256, 15, 1, 1, CYAN);
+	for (uint8_t i = 0; i < 127; i++) LCD_Line(98 + i, 11, 98 + i, 23, 1, RED);
+	for (uint8_t i = 0; i < 127; i++) LCD_Line(98 + i, 36, 98 + i, 48, 1, GREEN);
+	for (uint8_t i = 0; i < 127; i++) LCD_Line(98 + i, 61, 98 + i, 73, 1, BLUE);
+	for (uint16_t i = 0; i < 180; i++) LCD_Line(98 + i, 86, 98 + i, 98, 1, WHITE);
+	for (uint8_t i = 0; i < 127; i++) LCD_Line(98 + i, 111, 98 + i, 123, 1, GRAY);
+	for (uint8_t i = 0; i < 127; i++) LCD_Line(98 + i, 136, 98 + i, 148, 1, YELLOW);
+	for (uint8_t i = 0; i < 100; i++) LCD_Line(98 + i, 161, 98 + i, 173, 1, CYAN);
 
-
-	LCD_Font(25, 25, "R: 127", &DejaVu_Sans_20, 1, RED);
-	LCD_Font(25, 50, "G: 127", &DejaVu_Sans_20, 1, GREEN);
-	LCD_Font(25, 75, "B: 127", &DejaVu_Sans_20, 1, BLUE);
-	LCD_Font(25, 100, "H: 180", &DejaVu_Sans_20, 1, WHITE);
-	LCD_Font(25, 125, "S: 127", &DejaVu_Sans_20, 1, GRAY);
-	LCD_Font(25, 150, "V: 127", &DejaVu_Sans_20, 1, YELLOW);
-	LCD_Font(25, 175, "D: 100", &DejaVu_Sans_20, 1, CYAN);
   /* USER CODE END 2 */
 
   /* Infinite loop */

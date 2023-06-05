@@ -1,5 +1,6 @@
 "./Core/Src/at24.o"
 "./Core/Src/ili9488.o"
+"./Core/Src/interface.o"
 "./Core/Src/ir_remote.o"
 "./Core/Src/lighting.o"
 "./Core/Src/main.o"

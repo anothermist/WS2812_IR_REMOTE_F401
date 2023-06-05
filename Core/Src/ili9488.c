@@ -536,5 +536,5 @@ void LCD_Init(void) {
 	LCD_Command(SLEEP_OUT);
 	LCD_Command(DISPLAY_ON);
 	LCD_Orientation(DEFAULT_ORIENTATION);
-	LCD_Rect_Fill(0, 0, LCD_WIDTH, LCD_HEIGHT, BLACK);
+//	LCD_Rect_Fill(0, 0, LCD_WIDTH, LCD_HEIGHT, BLACK);
 }
