@@ -183,13 +183,13 @@ int main(void) {
 	LCD_Font(5, 150, "V:127", &DejaVu_Sans_Mono_20, 1, YELLOW);
 	LCD_Font(5, 175, "D:100", &DejaVu_Sans_Mono_20, 1, CYAN);
 
-	for (uint8_t i = 0; i < 127; i++) LCD_Line(98 + i, 11, 98 + i, 23, 1, RED);
-	for (uint8_t i = 0; i < 127; i++) LCD_Line(98 + i, 36, 98 + i, 48, 1, GREEN);
-	for (uint8_t i = 0; i < 127; i++) LCD_Line(98 + i, 61, 98 + i, 73, 1, BLUE);
-	for (uint16_t i = 0; i < 180; i++) LCD_Line(98 + i, 86, 98 + i, 98, 1, WHITE);
-	for (uint8_t i = 0; i < 127; i++) LCD_Line(98 + i, 111, 98 + i, 123, 1, GRAY);
-	for (uint8_t i = 0; i < 127; i++) LCD_Line(98 + i, 136, 98 + i, 148, 1, YELLOW);
-	for (uint8_t i = 0; i < 100; i++) LCD_Line(98 + i, 161, 98 + i, 173, 1, CYAN);
+	drawR (127);
+	drawG (127);
+	drawB (127);
+	drawH (240);
+	drawS (127);
+	drawV (127);
+	drawD (127);
 
   /* USER CODE END 2 */
 

@@ -1,1 +1,8 @@
 interface.c:3:6:show_clean	1
+interface.c:16:6:drawR	3
+interface.c:21:6:drawG	3
+interface.c:26:6:drawB	3
+interface.c:31:6:drawH	3
+interface.c:36:6:drawS	3
+interface.c:41:6:drawV	3
+interface.c:46:6:drawD	3
