@@ -1,4 +1,4 @@
-rgb_hsv.c:5:7:hsv_to_rgb	8
-rgb_hsv.c:70:7:max	4
-rgb_hsv.c:74:7:min	4
-rgb_hsv.c:78:7:rgb_to_hsv	6
+../Core/Src/rgb_hsv.c:5:7:hsv_to_rgb	8
+../Core/Src/rgb_hsv.c:70:7:max	4
+../Core/Src/rgb_hsv.c:74:7:min	4
+../Core/Src/rgb_hsv.c:78:7:rgb_to_hsv	6

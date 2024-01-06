@@ -1,4 +1,4 @@
-ws2812.c:14:6:led_rgb_to_buf_dma	5
-ws2812.c:28:6:led_prepareValue	1
-ws2812.c:85:6:led_setValue	2
-ws2812.c:106:6:led_light	1
+../Core/Src/ws2812.c:14:6:led_rgb_to_buf_dma	5
+../Core/Src/ws2812.c:28:6:led_prepareValue	1
+../Core/Src/ws2812.c:85:6:led_setValue	2
+../Core/Src/ws2812.c:106:6:led_light	1
